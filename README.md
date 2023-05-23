@@ -20,6 +20,19 @@ In order for the Crypto-Chela faucet to function correctly, it uses the BTCPaySe
 
 To establish the connection with the BTCPayServer, you need to rename the file called "env.cfg1" to "env.cfg" and enter your Keys and URL for this connection. Detailed instructions on how to do this are provided in the `Lightning.py` file itself.
 
+# Installing on-screen soft keyboard
+
+To run this project, you also need to do
+
+    git clone https://github.com/xlab/matchbox-keyboard.git 
+
+You'll need libfakekey:
+
+    sudo apt install libfakekey-dev libxft-dev
+
+Then do the usual autotool jig of ./configure, make, make install. ( If building from SVN you'll need to run ./autogen.sh before this).
+
+
 ## Support Us
 
 If you find this project exciting and want to support us, consider making a donation. Every little bit helps us in maintaining and improving Crypto-Chela. Here's how you can contribute:

@@ -20,7 +20,7 @@ import Rates
 import Lightning
 
 
-debug_log = True
+debug_log = False
 debug_payments = True  # True to allow debug and configurations
 
 paymentRequest = "Imposto eh roubo"
@@ -38,7 +38,7 @@ def OpenConfigWindow():
     root.attributes("-fullscreen", False)
     Config.ConfigWindow(root)
     labelBeer["text"] = str(Config.beer_name) + " ->  CL$" + str(Config.liter_priceBRL) + "/Litro"
-    labelInfo["text"] = "1 BTC = CL$" + str(Config.BTC_BRL) + " = US$" + str(Config.BTC_USD)
+    labelInfo["text"] = "1 BTC = CL$" + str(int(Config.BTC_BRL)) + " = US$" + str(Config.BTC_USD)
 
 def CancelBuy():
     Lightning.timeout = 0
@@ -51,7 +51,7 @@ def RequestInvoiceDaemon():
     global paymentRequest
     global paymentId
     paymentId, paymentRequest = Lightning.requestPaymentBrl(payment_amountBRL)
-    log.insert(0.0, "Lightning payment request: " + paymentRequest + "\n")
+    if debug_log: log.insert(0.0, "Lightning payment request: " + paymentRequest + "\n")
     PostInvoice()
 
 def RequestInvoice284():
@@ -82,7 +82,7 @@ def RequestInvoice():
     #payment_amount = payment_amountBRL/Config.SAT_BRL  # payment in Satoshis
     #payment_amount = int(payment_amount) # payment in Satoshis(integer)
     frameRequestInvoice.grid()
-    log.insert(0.0, "Requesting " + str(payment_amountBRL) + " CLP invoice in satoshis...\n")
+    if debug_log: log.insert(0.0, "Requesting " + str(payment_amountBRL) + " CLP invoice in satoshis...\n")
     requestInvoiceThread = threading.Thread(target=RequestInvoiceDaemon)
     requestInvoiceThread.daemon = True
     requestInvoiceThread.start()
@@ -97,24 +97,24 @@ def PostInvoice():
         labelQR['image'] = code_bmp
         frameQRcode.grid()
         paid = False
-        labelQRinfo['text'] = "Waiting payment\n R$" + str(round(payment_amountBRL, 2)) + \
-                              "   ->  " + str(payment_amount) + "sats"
+        labelQRinfo['text'] = "Esperando Pago\n CL$ " + str(round(payment_amountBRL, 2))
+        #+"   ->  " + str(payment_amount) + "sats"
         while Lightning.timeout and not paid:
-            labelTimeoutQR['text'] = "Time out:" + str(Lightning.timeout * 3) + "s"
+            labelTimeoutQR['text'] = "Tiempo restante:" + str(Lightning.timeout * 3) + "s"
             Lightning.timeout -= 1
             time.sleep(3)
             paid = Lightning.isInvoicePaid(paymentId)
             if paid:
-                log.insert(0.0, "Payment received!\n")
+                if debug_log: log.insert(0.0, "Payment received!\n")
             else:
-                log.insert(0.0, "Payment not received. Retrying\n")
+                if debug_log: log.insert(0.0, "Payment not received. Retrying\n")
         if Lightning.timeout:
             Dump()
         else:
-            log.insert(0.0, "Payment timeout\n")
+            if debug_log: log.insert(0.0, "Payment timeout\n")
             CancelBuy()
     else:
-        log.insert(0.0, "Invoice not received!\n")
+        if debug_log: log.insert(0.0, "Invoice not received!\n")
 
 def DumpControl():
     Pi.flow_counter = 0
@@ -132,7 +132,7 @@ def DumpControl():
         label_timeout['text'] = "Timeout: " + str(int(Lightning.timeout/10)) + "s"
         time.sleep(0.1)
     if not Lightning.timeout:
-        log.insert(0.0, "Pour timeout\n")
+        if debug_log: log.insert(0.0, "Pour timeout\n")
     CancelBuy()
 
 def Dump():
@@ -147,7 +147,7 @@ def get_rates():
     while not exit_app:
         Config.BTC_USD = Rates.get_rate_USD()
         Config.BTC_BRL = Rates.get_rate_BRL()
-        labelInfo["text"] = "1 BTC = R$" + str(Config.BTC_BRL) + " = $" + str(Config.BTC_USD)
+        labelInfo["text"] = "1 BTC = CL$ " + str(int(Config.BTC_BRL)) + " = US$ " + str(int(Config.BTC_USD))
         time.sleep(120) #2 min
 
 def start_live_rates():
@@ -190,7 +190,7 @@ def test_config_password():
         OpenConfigWindow()
         Config.ConfigWindow.get_config()
     else:
-        log.insert(0.0, "Incorrect Password!\n")
+        if debug_log: log.insert(0.0, "Incorrect Password!\n")
 
 def Exit():
     global exit_app
@@ -219,7 +219,8 @@ Config.ConfigWindow.get_config()
 #GUI constructors
 frameInfo = Frame(root)
 frameInfo.grid(row=0, column=0, sticky=N+S+W+E)
-labelBeer = Label(frameInfo, text=str(Config.beer_name)+" ->  CL$"+str(Config.liter_priceBRL)+"/Liter", font=('Calibri', 22, 'bold'), fg='gold')
+labelBeer = Label(frameInfo, text=str(Config.beer_name), font=('Calibri', 22, 'bold'), fg='gold')
+#+" ->  CL$"+str(Config.liter_priceBRL)+"/Liter"
 labelBeer.pack(side=TOP, pady=10)
 labelInfo = Label(frameInfo, text="1 BTC = CL$"+str(Config.BTC_BRL)+" = US$"+\
                     str(Config.BTC_USD), font=('Calibri', 21, 'bold'), fg='gold')
@@ -282,9 +283,9 @@ labelQRinfo = Label(frameQRcode, text="Esperando pago de \n CL$" +
 labelQRinfo.pack(side=TOP)
 labelQR = Label(frameQRcode, image=code_bmp)
 labelQR.pack(side=TOP)
-labelTimeoutQR = Label(frameQRcode, text="Time out:" + str(Lightning.timeout*3), font=('Calibri', 12))
+labelTimeoutQR = Label(frameQRcode, text="Tiempo restante:" + str(Lightning.timeout*3), font=('Calibri', 12))
 labelTimeoutQR.pack(side=TOP)
-cancelQR = Button(frameQRcode, text="Cancel Purchase", command=CancelBuy, highlightcolor='black',
+cancelQR = Button(frameQRcode, text="Cancelar Compra", command=CancelBuy, highlightcolor='black',
        width=buttonsWidth, height=1, activebackground='gold', activeforeground='black')
 cancelQR.pack(side=TOP)
 frameQRcode.grid(row=0, rowspan=2, column=0, sticky=N+S+W+E)
