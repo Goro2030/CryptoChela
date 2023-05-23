@@ -1,6 +1,9 @@
 [beer]
 name = Cerveza Al Kassr
 liter_price_brl = 10000.00
+500cc = 4990
+250cc = 3490
+vaso = 9990
 
 [calibration]
 flow = 3340
@@ -12,3 +15,4 @@ btc_usd = 9000.0
 [live]
 use_live_rates = True
 
+#refill de cerveza 500cc  4990 , 250cc 3490 y el vaso 500cc sin refill 5000

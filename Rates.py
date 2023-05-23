@@ -1,7 +1,7 @@
 
 """Rates.py: Get BTC prices to different currencies """
 
-__author__      = "Eduardo Schoenknecht"
+__author__      = "Mariano Silva"
 __credits__ = ["Eduardo Schoenknecht", "Felipe Borges Alves", "Paulo Eduardo Alves"]
 
 import requests

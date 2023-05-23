@@ -50,33 +50,39 @@ def CancelBuy():
 def RequestInvoiceDaemon():
     global paymentRequest
     global paymentId
-    paymentId, paymentRequest = Lightning.requestPaymentSat(payment_amount)
+    paymentId, paymentRequest = Lightning.requestPaymentBrl(payment_amountBRL)
     log.insert(0.0, "Lightning payment request: " + paymentRequest + "\n")
     PostInvoice()
 
 def RequestInvoice284():
     global dump_volume
-    dump_volume = 0.284
+    dump_volume = 0.250
     RequestInvoice()
 
 def RequestInvoice568():
     global dump_volume
-    dump_volume = 0.568
+    dump_volume = 0.500
     RequestInvoice()
 
 def RequestInvoice1000():
     global dump_volume
-    dump_volume = 1
+    dump_volume = 0.501
     RequestInvoice()
 
 def RequestInvoice():
     global payment_amount
     global payment_amountBRL
-    payment_amountBRL = Config.liter_priceBRL * dump_volume  # payment in BRL
-    payment_amount = payment_amountBRL/Config.SAT_BRL  # payment in Satoshis
-    payment_amount = int(payment_amount) # payment in Satoshis(integer)
+    #payment_amountBRL = Config.liter_priceBRL * dump_volume  # payment in BRL
+    if dump_volume == 0.501:
+        payment_amountBRL = Config.vaso
+    elif dump_volume == 0.500:
+        payment_amountBRL = Config.cc500
+    elif dump_volume == 0.250:
+        payment_amountBRL = Config.cc250
+    #payment_amount = payment_amountBRL/Config.SAT_BRL  # payment in Satoshis
+    #payment_amount = int(payment_amount) # payment in Satoshis(integer)
     frameRequestInvoice.grid()
-    log.insert(0.0, "Requesting " + str(payment_amount) + " satoshis...\n")
+    log.insert(0.0, "Requesting " + str(payment_amountBRL) + " CLP invoice in satoshis...\n")
     requestInvoiceThread = threading.Thread(target=RequestInvoiceDaemon)
     requestInvoiceThread.daemon = True
     requestInvoiceThread.start()
@@ -228,14 +234,14 @@ logoButton = Button(frameDoses)
 logo = PhotoImage(file="BTC.PNG")
 logoButton.config(image=logo, command=enter_config, bg='black', highlightthickness=0)
 logoButton.pack(side=TOP, pady=Ypads)
-SmallDoseButton = Button(frameDoses, text="Half Pint (284ml)", command=RequestInvoice284, highlightcolor='black',
-                         width=buttonsWidth, height=buttonsHeight, activebackground='gold', activeforeground='black')
+SmallDoseButton = Button(frameDoses, text="Refill Media Pinta (250cc)                    $"+str(int(Config.cc250)), command=RequestInvoice284, highlightcolor='black',
+                        justify=CENTER, wraplength= 350, width=buttonsWidth, height=buttonsHeight, activebackground='gold', activeforeground='black')
 SmallDoseButton.pack(side=TOP, pady=Ypads, padx=Xpads)
-MediumDoseButton = Button(frameDoses, text="Pint (568ml)", command=RequestInvoice568, highlightcolor='black',
-                         width=buttonsWidth, height=buttonsHeight, activebackground='gold', activeforeground='black')
+MediumDoseButton = Button(frameDoses, text="Refill Pinta (500cc)           $"+str(int(Config.cc500)), command=RequestInvoice568, highlightcolor='black',
+                         justify=CENTER, wraplength= 350, width=buttonsWidth, height=buttonsHeight, activebackground='gold', activeforeground='black')
 MediumDoseButton.pack(side=TOP, pady=Ypads, padx=Xpads)
-HighDoseButton = Button(frameDoses, text="Oktoberfest (1L)", command=RequestInvoice1000, highlightcolor='black',
-                         width=buttonsWidth, height=buttonsHeight, activebackground='gold', activeforeground='black')
+HighDoseButton = Button(frameDoses, text="Vaso Crypto (500cc)             $"+str(int(Config.vaso)), command=RequestInvoice1000, highlightcolor='black',
+                         justify=CENTER, wraplength= 350, width=buttonsWidth, height=buttonsHeight, activebackground='gold', activeforeground='black')
 HighDoseButton.pack(side=TOP, pady=Ypads, padx=Xpads)
 
 #Frame Config

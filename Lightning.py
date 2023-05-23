@@ -31,8 +31,7 @@ store_id = config['CONFIG']['store_id']  # Transbit_DEMO Store
 def requestPayment(amount, currency):
 
     currency = 'CLP'
-    amount = 1000
-    order_id = 'Test-Birra-' + str(random.randint(0, 1000))
+    order_id = 'Test-Birra-' + str(random.randint(0, 10000))
     
     headers = {
         'Content-Type': 'application/json',
@@ -90,7 +89,7 @@ def requestPaymentSat(amount):
     return requestPayment(amount, "sat")
 
 def requestPaymentBrl(amount):
-    return requestPayment(amount, "BRL")
+    return requestPayment(amount, "CLP")
 
 def requestPaymentUsdl(amount):
     return requestPayment(amount, "USD")

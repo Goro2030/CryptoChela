@@ -44,6 +44,9 @@ class ConfigWindow(Toplevel):
         global BTC_BRL
         global SAT_BRL
         global BTC_USD
+        global vaso
+        global cc250
+        global cc500
         global live_rates
         
         config = ConfigParser()
@@ -51,6 +54,9 @@ class ConfigWindow(Toplevel):
         beer_name = config.get('beer', 'name')
         liter_priceBRL = config.getfloat('beer', 'liter_price_brl')
         flow_calibration = config.getint('calibration', 'flow')
+        vaso = config.getfloat('beer', 'vaso')
+        cc250 = config.getfloat('beer', '250cc')
+        cc500 = config.getfloat('beer', '500cc')
         BTC_BRL = config.getfloat('money', 'btc_brl')
         SAT_BRL = BTC_BRL*0.00000001
         BTC_USD = config.getfloat('money', 'btc_usd')
