@@ -1,7 +1,7 @@
 
 """Calib.py: Calibration GUI file"""
 
-__author__      = "Eduardo Schoenknecht"
+__author__      = "Alexis Lanado"
 __credits__ = ["Eduardo Schoenknecht", "Felipe Borges Alves", "Paulo Eduardo Alves"]
 
 from tkinter import *

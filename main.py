@@ -2,7 +2,7 @@
 
 """main.py: Main BitBeer GUI file"""
 
-__author__      = "Eduardo Schoenknecht"
+__author__      = "Mariano Silva"
 __credits__ = ["Eduardo Schoenknecht", "Felipe Borges Alves", "Paulo Eduardo Alves"]
 
 from tkinter import *
@@ -37,8 +37,8 @@ Pi.init_hardware()
 def OpenConfigWindow():
     root.attributes("-fullscreen", False)
     Config.ConfigWindow(root)
-    labelBeer["text"] = str(Config.beer_name) + " ->  R$" + str(Config.liter_priceBRL) + "/Litro"
-    labelInfo["text"] = "1 BTC = R$" + str(Config.BTC_BRL) + " = US$" + str(Config.BTC_USD)
+    labelBeer["text"] = str(Config.beer_name) + " ->  CL$" + str(Config.liter_priceBRL) + "/Litro"
+    labelInfo["text"] = "1 BTC = CL$" + str(Config.BTC_BRL) + " = US$" + str(Config.BTC_USD)
 
 def CancelBuy():
     Lightning.timeout = 0
@@ -200,7 +200,7 @@ def Shutdown():
 # GUI
 root = Toplevel() #Used Toplevel instead of Tk() to workaround bugs in auto startup with crontab
 # GUI appearance
-root.wm_title("BitBeer")
+root.wm_title("Lightning-Chela")
 root.minsize(width=480, height=600)
 root.option_add("*Foreground", "gold")
 root.option_add("*Background", 'black')
@@ -213,7 +213,7 @@ Config.ConfigWindow.get_config()
 #GUI constructors
 frameInfo = Frame(root)
 frameInfo.grid(row=0, column=0, sticky=N+S+W+E)
-labelBeer = Label(frameInfo, text=str(Config.beer_name)+" ->  R$"+str(Config.liter_priceBRL)+"/Liter", font=('Calibri', 22, 'bold'), fg='gold')
+labelBeer = Label(frameInfo, text=str(Config.beer_name)+" ->  CL$"+str(Config.liter_priceBRL)+"/Liter", font=('Calibri', 22, 'bold'), fg='gold')
 labelBeer.pack(side=TOP, pady=10)
 labelInfo = Label(frameInfo, text="1 BTC = CL$"+str(Config.BTC_BRL)+" = US$"+\
                     str(Config.BTC_USD), font=('Calibri', 21, 'bold'), fg='gold')
@@ -225,7 +225,7 @@ buttonsHeight = 2
 Ypads = (0, 30)
 Xpads = 100
 logoButton = Button(frameDoses)
-logo = PhotoImage(file="RaspberryGUI/BTC.PNG")
+logo = PhotoImage(file="BTC.PNG")
 logoButton.config(image=logo, command=enter_config, bg='black', highlightthickness=0)
 logoButton.pack(side=TOP, pady=Ypads)
 SmallDoseButton = Button(frameDoses, text="Half Pint (284ml)", command=RequestInvoice284, highlightcolor='black',
@@ -259,7 +259,7 @@ frameConfig.grid_remove()
 
 #Frame Request Invoice
 frameRequestInvoice = Frame(root)
-label = Label(frameRequestInvoice, text="Requesting Invoice...", font=('Calibri', 20, 'bold'))
+label = Label(frameRequestInvoice, text="Generando Factura Lightning ...", font=('Calibri', 20, 'bold'))
 label.pack()
 frameRequestInvoice.grid(row=0, rowspan=2, column=0, sticky=N+S+W+E)
 frameRequestInvoice.grid_remove()
@@ -271,7 +271,7 @@ code_bmp = BitmapImage(data=code_xbm)
 code_bmp.config(background="white")
 frameQRcode = Frame(root)
 
-labelQRinfo = Label(frameQRcode, text="Waiting payment\n R$" +
+labelQRinfo = Label(frameQRcode, text="Esperando pago de \n CL$" +
                                       str(round(payment_amount, 2)), font=('Calibri', 20, 'bold'))
 labelQRinfo.pack(side=TOP)
 labelQR = Label(frameQRcode, image=code_bmp)
@@ -286,7 +286,7 @@ frameQRcode.grid_remove()
 
 #Dump
 frameDump = Frame(root)
-labelDumping = Label(frameDump, text="Pouring...", font=('Calibri', 20, 'bold'))
+labelDumping = Label(frameDump, text="Sirviendo su Lightning-Chela...", font=('Calibri', 20, 'bold'))
 labelDumping.pack(side=TOP)
 label_flow_counter = Label(frameDump, text="0", font=('Calibri', 20, 'bold'))
 label_flow_counter.pack(side=TOP)

@@ -1,7 +1,7 @@
 
 """Lightning.py: API to connect to BTCPayServer instance"""
 
-__author__      = "Mariano Daniel Silva"
+__author__      = "Mariano Silva"
 __credits__ = ["Eduardo Schoenknecht", "Felipe Borges Alves", "Paulo Eduardo Alves"]
 
 
@@ -15,25 +15,23 @@ from requests.auth import HTTPBasicAuth
 import configparser
 
 # old shit
-# BASE_URL = "https://md5hash.ddns.net:8080/LndPayRequest/v1"
 HTTP_OK = 200
 timeout = 0
 
-#new stuff
-
+#new stuff BTCPayServer
 config = configparser.ConfigParser()
 config.sections()
-config.read('RaspberryGUI/env.cfg')
+config.read('env.cfg')
 config.sections()
 host =  config['CONFIG']['host']
 api_key = config['CONFIG']['api_key']    # Account Setting --> Mariano User level API Key "Programatic Access"
 store_id = config['CONFIG']['store_id']  # Transbit_DEMO Store
 
-
 # Pedir una invoice nueva por la compra
 def requestPayment(amount, currency):
 
     currency = 'CLP'
+    amount = 1000
     order_id = 'Test-Birra-' + str(random.randint(0, 1000))
     
     headers = {
@@ -48,7 +46,7 @@ def requestPayment(amount, currency):
         'metadata' : { 
             'orderId': order_id,
             'itemDesc': "Birrita Test",
-            'buyerName': "Lightning CHela Customer"
+            'buyerName': "Lightning Chela Customer"
             }
     }
 
@@ -60,11 +58,10 @@ def requestPayment(amount, currency):
         response.raise_for_status()
         invoice = response.json()
         lninvoice = invoice['id']
-        print(lninvoice)
+        print("Invoice ID: ",lninvoice)
         
     except requests.exceptions.RequestException as e:
         print("Error:", e)
-
 
     # Obtener la ln-invoice por la compra recien realizada
 
@@ -81,9 +78,9 @@ def requestPayment(amount, currency):
         response.raise_for_status()
         invoice = response.json()
         print(invoice)
-        paymentLink = invoice[0].get('paymentLink')
+        paymentLink = invoice[1].get('paymentLink')
         
-        print("\n Invoice ID:" + paymentLink)
+        print("\n Invoice ID: " + paymentLink)
     except requests.exceptions.RequestException as e:
         print("Error:", e)
 
@@ -92,20 +89,33 @@ def requestPayment(amount, currency):
 def requestPaymentSat(amount):
     return requestPayment(amount, "sat")
 
-
 def requestPaymentBrl(amount):
     return requestPayment(amount, "BRL")
-
 
 def requestPaymentUsdl(amount):
     return requestPayment(amount, "USD")
 
-
 def isInvoicePaid(paymentId):
-    response = requests.get(BASE_URL + "/paymentstatus/" + paymentId, verify="lndpayrequest.crt")
-    if response.status_code != HTTP_OK:
-        print("Error checking payment status")
-        exit()
 
-    data = json.loads(response.text)
-    return bool(data["paid"])
+    url = f'{host}/api/v1/stores/{store_id}/invoices/{paymentId}'
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Token {api_key}',
+    }
+
+    try:
+        response = requests.get(url,  headers=headers)
+        response.raise_for_status()
+        invoice = response.json()
+        print(invoice)
+        status =  invoice['status']
+        print ("Invoice Status: ",status)
+    except requests.exceptions.RequestException as e:
+        print("Error:", e)
+    
+    paid = False
+
+    if status == "Settled": 
+        paid = True
+
+    return paid

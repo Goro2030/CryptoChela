@@ -1,7 +1,7 @@
 
 """Config.py: Configuration GUI """
 
-__author__      = "Eduardo Schoenknecht"
+__author__      = "Mariano Silva"
 __credits__ = ["Eduardo Schoenknecht", "Felipe Borges Alves", "Paulo Eduardo Alves"]
 
 from tkinter import *
@@ -47,7 +47,7 @@ class ConfigWindow(Toplevel):
         global live_rates
         
         config = ConfigParser()
-        config.read('RaspberryGUI/config.beer')
+        config.read('config.beer')
         beer_name = config.get('beer', 'name')
         liter_priceBRL = config.getfloat('beer', 'liter_price_brl')
         flow_calibration = config.getint('calibration', 'flow')
