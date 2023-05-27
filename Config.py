@@ -1,4 +1,3 @@
-
 """Config.py: Configuration GUI """
 
 __author__      = "Mariano Silva"
@@ -11,15 +10,16 @@ import tkinter.messagebox as mbox
 import Pi
 import Calib
 
-beer_name = "Pilsen"
-liter_priceBRL = 0.01  # 1 cent of Brazilian Real
-flow_calibration = 3340  # pulses/Liter
-BTC_BRL = 33000
-SAT_BRL = BTC_BRL*0.00000001
-BTC_USD = 8000
-live_rates = False
+# Default configuration parameters
+beer_name = "Pilsen"  # The name of the beer
+liter_priceBRL = 0.01  # The price per liter in Brazilian Real
+flow_calibration = 3340  # pulses per liter for flow calibration
+BTC_BRL = 33000  # The exchange rate from Bitcoin to Brazilian Real
+SAT_BRL = BTC_BRL*0.00000001  # The exchange rate from Satoshi to Brazilian Real
+BTC_USD = 8000  # The exchange rate from Bitcoin to US Dollar
+live_rates = False  # If true, use live rates for currency conversion, otherwise use fixed rates
 
-
+# This class generates a tkinter Toplevel window for configuring the beer dispenser
 class ConfigWindow(Toplevel):
     def __init__(self, parent):
         Toplevel.__init__(self, parent)
@@ -27,6 +27,7 @@ class ConfigWindow(Toplevel):
         self.transient(parent)
         self.parent = parent
         self.geometry("600x600+0+0")
+        # Creates different sections in the settings window
         self.beer_box()
         self.CalibBox()
         self.ValveBox()
@@ -37,6 +38,7 @@ class ConfigWindow(Toplevel):
         self.wait_window(self)
 
     @staticmethod
+    # Loads configuration from a file
     def get_config():
         global beer_name
         global liter_priceBRL
@@ -65,6 +67,7 @@ class ConfigWindow(Toplevel):
         else:
             live_rates = False
 
+    # Switches the valve state between open and closed
     def toggle_valve(self):
         if Pi.valve_opened:
             self.valveButton['text'] = "Open Valve"
@@ -73,6 +76,7 @@ class ConfigWindow(Toplevel):
             self.valveButton['text'] = "Close Valve"
             Pi.open_valve()
 
+    # Calibrates the flow meter
     def calc_calib(self):
         global flow_calibration
         Pi.flow_counter = 0
@@ -82,11 +86,12 @@ class ConfigWindow(Toplevel):
             self.entryPulses.delete(0, END)
             self.entryPulses.insert(0, flow_calibration)
 
-
+    # Sets the beer name
     def set_beer_name(self):
         global beer_name
         beer_name = self.entryName.get()
-        
+
+    # Sets the beer price
     def set_beer_price(self):
         global liter_priceBRL
         try:
@@ -95,6 +100,7 @@ class ConfigWindow(Toplevel):
             mbox.showerror(title="Invalid Price",
                            message="Numbers only. Ex: '1.99'")
 
+    # Sets the flow calibration
     def set_calibration(self):
         global flow_calibration
         try:
@@ -103,6 +109,7 @@ class ConfigWindow(Toplevel):
             mbox.showerror(title="Invalid calibration",
                            message="Integers only")
 
+    # Sets the currency rates
     def set_money(self):
         global BTC_BRL
         global BTC_USD
@@ -118,6 +125,7 @@ class ConfigWindow(Toplevel):
         else:
             live_rates = False
 
+    # Generates the box in the GUI for beer related settings    
     def beer_box(self):
         box = Frame(self)
         label_beer = Label(box, text="Beer data:").pack(side=TOP, pady=(10, 0))

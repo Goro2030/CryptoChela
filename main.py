@@ -108,7 +108,7 @@ def PostInvoice():
         labelQRinfo['text'] = "Esperando Pago\n CL$ " + str(round(payment_amountBRL, 2))
         #+"   ->  " + str(payment_amount) + "sats"
         while Lightning.timeout and not paid:
-            labelTimeoutQR['text'] = "Tiempo restante:" + str(Lightning.timeout * 3) + "s"
+            labelTimeoutQR['text'] = "Tiempo restante: " + str(Lightning.timeout * 3) + "s"
             Lightning.timeout -= 1
             time.sleep(3)
             paid = Lightning.isInvoicePaid(paymentId)
@@ -124,7 +124,7 @@ def PostInvoice():
     else:
         if debug_log: log.insert(0.0, "Invoice not received!\n")
 
-def dump_control():
+def DumpControl():
     """
     Controls the dumping of a volume of beer.
     """
@@ -143,9 +143,9 @@ def dump_control():
     while Lightning.timeout and Pi.flow_counter < dump_pulses:
         Lightning.timeout -= 1 # Decrease the timeout by 1 (equivalent to 0.1 seconds)
         current_volume = int(Pi.flow_counter * 1000 / Config.flow_calibration) # Calculate and display the current volume
-        label_flow_counter['text'] = f"{current_volume}ml"  # Display current volume in milliliters
+        label_flow_counter['text'] = f"{current_volume} ml de {dump_volume*1000} ml"  # Display current volume in milliliters
         dump_progress_bar['value'] = Pi.flow_counter # Update the progress bar
-        label_timeout['text'] = f"Timeout: {int(Lightning.timeout / 10)}s" # Display the remaining timeout in seconds
+        label_timeout['text'] = f"Tiempo restante: {int(Lightning.timeout / 10)}s" # Display the remaining timeout in seconds
         time.sleep(0.1)  # Sleep for 0.1 seconds before the next iteration
 
     # Check if the timeout has reached zero, indicating a pour timeout
@@ -299,12 +299,12 @@ code_bmp = BitmapImage(data=code_xbm)
 code_bmp.config(background="white")
 frameQRcode = Frame(root)
 
-labelQRinfo = Label(frameQRcode, text="Esperando pago de \n CL$" +
+labelQRinfo = Label(frameQRcode, text="Esperando pago \n CL$" +
                                       str(round(payment_amount, 2)), font=('Calibri', 20, 'bold'))
 labelQRinfo.pack(side=TOP)
 labelQR = Label(frameQRcode, image=code_bmp)
 labelQR.pack(side=TOP)
-labelTimeoutQR = Label(frameQRcode, text="Tiempo restante:" + str(Lightning.timeout*3), font=('Calibri', 12))
+labelTimeoutQR = Label(frameQRcode, text="Tiempo restante: " + str(Lightning.timeout*3), font=('Calibri', 12))
 labelTimeoutQR.pack(side=TOP)
 cancelQR = Button(frameQRcode, text="Cancelar Compra", command=CancelBuy, highlightcolor='black',
        width=buttonsWidth, height=1, activebackground='gold', activeforeground='black')
