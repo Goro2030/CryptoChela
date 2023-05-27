@@ -5,6 +5,7 @@
 __author__      = "Mariano Silva"
 __credits__ = ["Eduardo Schoenknecht", "Felipe Borges Alves", "Paulo Eduardo Alves"]
 
+# Import required packages
 from tkinter import *
 from tkinter import ttk
 import time
@@ -19,10 +20,11 @@ import Pi
 import Rates
 import Lightning
 
-
-debug_log = False
+# Define variables for debugging purposes
+debug_log = True
 debug_payments = True  # True to allow debug and configurations
 
+# Define default variables for payment
 paymentRequest = "Imposto eh roubo"
 paymentId = 0
 payment_amountBRL = 0
@@ -32,14 +34,17 @@ dump_pulses = 0
 config_conter = 0
 exit_app = False
 
+# Initialize Raspberry Pi hardware
 Pi.init_hardware()
 
+# Function to open configuration window
 def OpenConfigWindow():
     root.attributes("-fullscreen", False)
     Config.ConfigWindow(root)
     labelBeer["text"] = str(Config.beer_name) + " ->  CL$" + str(Config.liter_priceBRL) + "/Litro"
     labelInfo["text"] = "1 BTC = CL$" + str(int(Config.BTC_BRL)) + " = US$" + str(Config.BTC_USD)
 
+# Function to cancel buy operation
 def CancelBuy():
     Lightning.timeout = 0
     Pi.close_valve()
@@ -47,6 +52,7 @@ def CancelBuy():
     frameQRcode.grid_remove()
     frameDump.grid_remove()
 
+# Function to request invoice in separate thread
 def RequestInvoiceDaemon():
     global paymentRequest
     global paymentId
@@ -54,6 +60,7 @@ def RequestInvoiceDaemon():
     if debug_log: log.insert(0.0, "Lightning payment request: " + paymentRequest + "\n")
     PostInvoice()
 
+# Functions to set dump volume and request invoice
 def RequestInvoice284():
     global dump_volume
     dump_volume = 0.250
@@ -69,6 +76,7 @@ def RequestInvoice1000():
     dump_volume = 0.501
     RequestInvoice()
 
+# Function to calculate payment amount and request invoice 
 def RequestInvoice():
     global payment_amount
     global payment_amountBRL
@@ -116,24 +124,37 @@ def PostInvoice():
     else:
         if debug_log: log.insert(0.0, "Invoice not received!\n")
 
-def DumpControl():
+def dump_control():
+    """
+    Controls the dumping of a volume of beer.
+    """
+    # Set initial flow counter and timeout value
     Pi.flow_counter = 0
-    Lightning.timeout = 600  # 60.0seconds
-    dump_pulses = dump_volume*Config.flow_calibration
-    dump_pulses = int(dump_pulses) #pulses from flowmeter allowed
+    Lightning.timeout = 600  # 60.0 seconds
+
+    # Calculate the number of pulses required to reach the desired volume
+    dump_pulses = int(dump_volume * Config.flow_calibration)  
+
+    # Set the maximum and current values for the progress bar
     dump_progress_bar['maximum'] = dump_pulses
     dump_progress_bar['value'] = 0
-    while(Lightning.timeout and Pi.flow_counter<dump_pulses):
-        Lightning.timeout -= 1
-        current_volume = Pi.flow_counter * 1000 / Config.flow_calibration
-        current_volume = int(current_volume)
-        label_flow_counter['text'] = str(current_volume)+"ml"
-        dump_progress_bar['value'] = Pi.flow_counter
-        label_timeout['text'] = "Timeout: " + str(int(Lightning.timeout/10)) + "s"
-        time.sleep(0.1)
-    if not Lightning.timeout:
-        if debug_log: log.insert(0.0, "Pour timeout\n")
+
+    # While the timeout has not reached zero and the flow counter is less than the desired number of pulses
+    while Lightning.timeout and Pi.flow_counter < dump_pulses:
+        Lightning.timeout -= 1 # Decrease the timeout by 1 (equivalent to 0.1 seconds)
+        current_volume = int(Pi.flow_counter * 1000 / Config.flow_calibration) # Calculate and display the current volume
+        label_flow_counter['text'] = f"{current_volume}ml"  # Display current volume in milliliters
+        dump_progress_bar['value'] = Pi.flow_counter # Update the progress bar
+        label_timeout['text'] = f"Timeout: {int(Lightning.timeout / 10)}s" # Display the remaining timeout in seconds
+        time.sleep(0.1)  # Sleep for 0.1 seconds before the next iteration
+
+    # Check if the timeout has reached zero, indicating a pour timeout
+    if not Lightning.timeout and debug_log: 
+        log.insert(0.0, "Pour timeout\n")
+
+    # Cancel the buy operation
     CancelBuy()
+
 
 def Dump():
     Pi.flow_counter = 0
